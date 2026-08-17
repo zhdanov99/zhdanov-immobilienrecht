@@ -29,11 +29,9 @@ gesamten Ordner hochladen.
 ## Vor dem Livegang bitte noch ergänzen
 
 Im Text mit <span class="placeholder">gelb markierte</span> Stellen in
-`impressum.html`, `datenschutz.html` und `js/script.js` (Variable
-`KANZLEI_EMAIL`) enthalten Platzhalter, die aus rechtlichen Gründen durch
-die tatsächlichen Angaben ersetzt werden müssen:
+`impressum.html` und `datenschutz.html` enthalten Platzhalter, die aus
+rechtlichen Gründen durch die tatsächlichen Angaben ersetzt werden müssen:
 
-- Tatsächliche Kanzlei-E-Mail-Adresse (aktuell: `kanzlei@zhdanov-immobilienrecht.de`)
 - USt-IdNr. (falls vorhanden)
 - Zuständige Rechtsanwaltskammer (Adresse bitte bestätigen)
 - Angaben zur Berufshaftpflichtversicherung (gesetzlich vorgeschrieben, § 51 BRAO)

@@ -34,7 +34,7 @@
   // Contact form: build a pre-filled email via mailto (no backend required)
   var form = document.getElementById("kontakt-form");
   var note = document.getElementById("form-note");
-  var KANZLEI_EMAIL = "kanzlei@zhdanov-immobilienrecht.de";
+  var KANZLEI_EMAIL = "mz@zhdanov-kanzlei.de";
 
   if (form && note) {
     form.addEventListener("submit", function (event) {
