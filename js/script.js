@@ -31,7 +31,10 @@
     });
   }
 
-  // Contact form: build a pre-filled email via mailto (no backend required)
+  // Contact form: no server-side submission by design (static hosting, no backend).
+  // Validates the fields client-side, then falls back to a pre-filled mailto: link.
+  // To wire this up to a real backend later (e.g. Formspree or a custom endpoint),
+  // replace the mailto redirect below with a fetch() POST to that service.
   var form = document.getElementById("kontakt-form");
   var note = document.getElementById("form-note");
   var KANZLEI_EMAIL = "mz@zhdanov-kanzlei.de";
