@@ -49,17 +49,8 @@ rechtlichen Gründen durch die tatsächlichen Angaben ersetzt werden müssen:
   angepasst, siehe Commit-Historie für das verwendete Skript.
 - `img/kanzlei-empfang.jpg` – Empfangsfoto der Kanzlei, im Abschnitt
   "Die Zhdanov Kanzlei" (`.about-photo`).
-
-Für Rechtsanwalt Michael Zhdanov selbst zeigt der Abschnitt "Über den
-Gründer" aktuell noch einen Kreis-Platzhalter mit den Initialen "MZ"
-(`.about-portrait`). Um ein echtes Porträtfoto einzusetzen, die Datei nach
-`img/` legen und im Markup ersetzen:
-
-```html
-<div class="about-portrait">
-  <img src="img/michael-zhdanov.jpg" alt="Porträt von Rechtsanwalt Michael Zhdanov">
-</div>
-```
+- `img/michael-zhdanov.jpg` – Porträtfoto von Rechtsanwalt Michael Zhdanov,
+  im Abschnitt "Über den Gründer" (`.about-portrait`).
 
 ## Kontaktformular
 
