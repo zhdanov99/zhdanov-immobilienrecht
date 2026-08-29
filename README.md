@@ -9,7 +9,7 @@ Statische Landingpage (HTML/CSS/JS, keine Build-Tools, kein Backend nötig).
 - `datenschutz.html` – Datenschutzerklärung
 - `css/styles.css` – Styles
 - `js/script.js` – Mobiles Menü, Kontaktformular
-- `img/` – Fotos für den Bereich "Über uns" (siehe unten)
+- `img/` – Logo und Fotos (siehe unten)
 
 ## Lokal ansehen
 
@@ -38,24 +38,24 @@ rechtlichen Gründen durch die tatsächlichen Angaben ersetzt werden müssen:
 - Angaben zur Berufshaftpflichtversicherung (gesetzlich vorgeschrieben, § 51 BRAO)
 - Hosting-Provider in der Datenschutzerklärung, sobald das Hosting feststeht
 
-## Fotos im Bereich "Über uns"
+## Logo und Fotos
 
-Im Abschnitt "Über uns" (`index.html`, `.about-block`) stehen aktuell zwei
-gestaltete Platzhalter anstelle echter Fotos:
+- `img/logo-zhdanov-kanzlei.png` – vollständiges Logo (Waage-Icon + Schriftzug
+  + Slogan), navyfarben mit transparentem Hintergrund. Wird groß am Anfang
+  des Abschnitts "Über uns" gezeigt.
+- `img/logo-mark-light.png` – nur das Waage-Icon, in Gold auf transparentem
+  Hintergrund, für den dunklen Header/Footer. Beide Dateien wurden aus der
+  Original-Logodatei freigestellt (Weiß zu Transparenz) und farblich
+  angepasst, siehe Commit-Historie für das verwendete Skript.
+- `img/kanzlei-empfang.jpg` – Empfangsfoto der Kanzlei, im Abschnitt
+  "Die Zhdanov Kanzlei" (`.about-photo`).
 
-- Ein Icon-Panel für die Kanzlei/das Büro
-- Ein Kreis mit den Initialen "MZ" für Rechtsanwalt Michael Zhdanov
-
-Um die tatsächlichen Fotos einzusetzen, die entsprechenden Bilddateien nach
+Für Rechtsanwalt Michael Zhdanov selbst zeigt der Abschnitt "Über den
+Gründer" aktuell noch einen Kreis-Platzhalter mit den Initialen "MZ"
+(`.about-portrait`). Um ein echtes Porträtfoto einzusetzen, die Datei nach
 `img/` legen und im Markup ersetzen:
 
 ```html
-<!-- Kanzlei-Foto: ersetzt das Icon-Panel -->
-<div class="about-photo">
-  <img src="img/zhdanov-kanzlei.jpg" alt="Empfang der Zhdanov Kanzlei am Kurfürstendamm">
-</div>
-
-<!-- Porträt Michael Zhdanov: ersetzt "MZ" -->
 <div class="about-portrait">
   <img src="img/michael-zhdanov.jpg" alt="Porträt von Rechtsanwalt Michael Zhdanov">
 </div>
