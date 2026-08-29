@@ -294,12 +294,24 @@ img { max-width: 100%; display: block; }
 }
 
 /* ---------- About ---------- */
-.about-grid {
-  display: grid;
-  grid-template-columns: 220px 1fr;
+.about-block {
+  display: flex;
   gap: 56px;
-  align-items: start;
+  align-items: center;
 }
+.about-block + .about-block {
+  margin-top: 4em;
+  padding-top: 4em;
+  border-top: 1px solid var(--border);
+}
+.about-block.reverse { flex-direction: row-reverse; }
+.about-block .about-media {
+  flex: 0 0 260px;
+  display: flex;
+  justify-content: center;
+}
+.about-block .about-content { flex: 1 1 auto; min-width: 0; }
+.about-block .about-content h3 { margin-top: 0; }
 
 .about-portrait {
   width: 220px;
@@ -314,7 +326,33 @@ img { max-width: 100%; display: block; }
   justify-content: center;
   border: 6px solid var(--white);
   box-shadow: 0 8px 24px rgba(16,35,61,0.18);
+  overflow: hidden;
 }
+.about-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.about-photo {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 6px;
+  background: linear-gradient(160deg, var(--navy) 0%, var(--navy-lighter) 100%);
+  color: var(--gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(16,35,61,0.18);
+  overflow: hidden;
+}
+.about-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.about-photo svg { width: 40%; height: 40%; }
 
 /* ---------- Kontakt ---------- */
 .kontakt-grid {
@@ -462,7 +500,11 @@ textarea { resize: vertical; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
-  .about-grid { grid-template-columns: 1fr; }
+  .about-block, .about-block.reverse {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .about-block .about-media { flex-basis: auto; width: 200px; }
   .about-portrait { width: 150px; height: 150px; font-size: 2.2rem; }
   .kontakt-grid { grid-template-columns: 1fr; }
 }
