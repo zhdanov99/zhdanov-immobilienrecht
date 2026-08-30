@@ -224,10 +224,7 @@ img { max-width: 100%; display: block; }
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--gold);
-  margin-bottom: 1em;
-  padding-bottom: 0.9em;
-  border-bottom: 2px solid var(--gold);
-  display: inline-block;
+  margin-bottom: 0.8em;
 }
 .hero h1 { color: var(--navy); }
 .hero-lead {
@@ -552,7 +549,7 @@ textarea { resize: vertical; }
   .hero { padding-top: 48px; }
 
   .hero h1 {
-    font-size: 44px;
+    font-size: 41px;
     line-height: 1.08;
     overflow-wrap: break-word;
   }
