@@ -28,6 +28,7 @@ body {
   background: var(--bg);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
 }
 
 h1, h2, h3 {
@@ -35,6 +36,9 @@ h1, h2, h3 {
   color: var(--navy);
   line-height: 1.25;
   margin: 0 0 0.5em;
+  overflow-wrap: break-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 
 h1 { font-size: clamp(2rem, 4.5vw, 3.1rem); }
