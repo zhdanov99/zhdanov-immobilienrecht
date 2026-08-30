@@ -552,9 +552,12 @@ textarea { resize: vertical; }
   .hero { padding-top: 48px; }
 
   .hero h1 {
-    font-size: 41px;
-    line-height: 1.08;
-    overflow-wrap: break-word;
+    font-size: clamp(30px, 9.5vw, 42px);
+    line-height: 1.06;
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+    -webkit-hyphens: none;
   }
 
   .card { padding: 18px 20px; }
