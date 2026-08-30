@@ -259,6 +259,9 @@ img { max-width: 100%; display: block; }
   font-size: 0.95rem;
   letter-spacing: 0.02em;
 }
+@media (max-width: 767px) {
+  .trust-bar { display: none; }
+}
 
 /* ---------- Cards ---------- */
 .card-grid {
