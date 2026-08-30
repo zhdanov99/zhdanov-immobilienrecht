@@ -215,7 +215,7 @@ img { max-width: 100%; display: block; }
 .hero {
   background: var(--white);
   color: var(--text);
-  padding: 96px 0;
+  padding: 56px 0 96px;
 }
 .hero-inner { max-width: 760px; }
 .hero .eyebrow {
@@ -771,7 +771,7 @@ textarea { resize: vertical; }
   .form-row-split { grid-template-columns: 1fr; }
   .section { padding: 60px 0; }
 
-  .hero { padding-top: 48px; }
+  .hero { padding-top: 34px; }
 
   .hero h1 {
     font-size: clamp(30px, 9.5vw, 42px);
