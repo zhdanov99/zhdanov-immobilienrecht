@@ -562,4 +562,10 @@ textarea { resize: vertical; }
     width: 82%;
     align-self: flex-start;
   }
+
+  .about-logo {
+    max-width: 210px;
+    margin: 0 auto 1.75em;
+  }
+  #ueber-uns { padding-top: 36px; }
 }
