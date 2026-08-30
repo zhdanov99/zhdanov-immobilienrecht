@@ -556,4 +556,10 @@ textarea { resize: vertical; }
 
   .card { padding: 18px 20px; }
   .card-grid { gap: 18px; }
+
+  .about-block:not(.reverse) { gap: 36px; }
+  .about-block:not(.reverse) .about-media {
+    width: 82%;
+    align-self: flex-start;
+  }
 }
