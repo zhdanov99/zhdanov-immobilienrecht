@@ -41,7 +41,13 @@ h1, h2, h3 {
   hyphens: auto;
 }
 
-h1 { font-size: clamp(2rem, 4.5vw, 3.1rem); }
+h1 {
+  font-size: clamp(2rem, 4.5vw, 3.1rem);
+  hyphens: manual;
+  -webkit-hyphens: manual;
+  overflow-wrap: normal;
+  word-break: normal;
+}
 h2 { font-size: clamp(1.6rem, 3vw, 2.3rem); }
 h3 { font-size: 1.2rem; }
 
@@ -530,4 +536,9 @@ textarea { resize: vertical; }
   .header-phone { display: none; }
   .form-row-split { grid-template-columns: 1fr; }
   .section { padding: 60px 0; }
+
+  .hero h1 {
+    font-size: clamp(2rem, calc(12.5vw - 8px), 2.75rem);
+    line-height: 1.1;
+  }
 }
