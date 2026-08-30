@@ -15,6 +15,21 @@
     window.addEventListener("scroll", updateHeaderShadow, { passive: true });
   }
 
+  // Fixed "Kontakt" CTA: hidden while the Kontakt section itself is in view
+  var ctaFixed = document.getElementById("cta-fixed");
+  var kontaktSection = document.getElementById("kontakt");
+  if (ctaFixed && kontaktSection && "IntersectionObserver" in window) {
+    var ctaObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          ctaFixed.classList.toggle("is-hidden", entry.isIntersecting);
+        });
+      },
+      { threshold: 0 }
+    );
+    ctaObserver.observe(kontaktSection);
+  }
+
   // Mobile navigation toggle
   var navToggle = document.getElementById("nav-toggle");
   var mainNav = document.getElementById("main-nav");
