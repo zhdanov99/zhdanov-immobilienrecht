@@ -241,6 +241,10 @@ img { max-width: 100%; display: block; }
   flex-wrap: wrap;
   margin-top: 2em;
 }
+.hero-actions .btn {
+  min-width: 260px;
+  text-align: center;
+}
 
 /* ---------- Trust bar ---------- */
 .trust-bar {
