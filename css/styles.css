@@ -549,6 +549,8 @@ textarea { resize: vertical; }
   .form-row-split { grid-template-columns: 1fr; }
   .section { padding: 60px 0; }
 
+  .hero { padding-top: 48px; }
+
   .hero h1 {
     font-size: 44px;
     line-height: 1.08;
