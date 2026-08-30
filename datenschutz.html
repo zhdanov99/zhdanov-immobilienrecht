@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Datenschutzerklärung | Zhdanov Kanzlei</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
@@ -85,11 +85,20 @@
     Bearbeitung Ihres Anliegens verarbeitet (Art. 6 Abs. 1 lit. b bzw. lit. f DSGVO).
   </p>
 
-  <h2>6. Cookies</h2>
+  <h2>6. Cookies und lokale Speicherung</h2>
   <p>
     Diese Website verwendet keine Cookies zu Analyse- oder Marketingzwecken und bindet
     keine externen Schriftarten, Karten- oder Trackingdienste ein, die eine Übertragung
     Ihrer Daten an Dritte auslösen würden.
+  </p>
+  <p>
+    Beim Aufruf der Website weisen wir Sie über einen Hinweis-Banner auf diesen Sachverhalt
+    hin. Ihre Auswahl wird ausschließlich technisch notwendig im lokalen Speicher (Local
+    Storage) Ihres Browsers abgelegt, damit der Hinweis nicht bei jedem Seitenaufruf erneut
+    erscheint. Diese Information verbleibt auf Ihrem Gerät und wird nicht an uns oder Dritte
+    übertragen. Sollten wir künftig optionale Analyse- oder Marketingdienste einsetzen, würden
+    diese erst nach Ihrer aktiven Einwilligung geladen. Sie können Ihre Auswahl jederzeit über
+    den Link &bdquo;Datenschutzeinstellungen&ldquo; im Fußbereich der Website ändern.
   </p>
 
   <h2>7. Ihre Rechte</h2>
@@ -122,10 +131,51 @@
     <nav class="footer-nav">
       <a href="impressum.html">Impressum</a>
       <a href="datenschutz.html">Datenschutz</a>
+      <button type="button" class="footer-cookie-link" id="footer-cookie-settings">Datenschutzeinstellungen</button>
     </nav>
   </div>
 </footer>
 
+<div class="cookie-banner" id="cookie-banner" role="dialog" aria-live="polite" aria-labelledby="cookie-banner-heading" aria-describedby="cookie-banner-text" hidden>
+  <div class="cookie-banner-inner">
+    <p class="cookie-banner-heading" id="cookie-banner-heading">Datenschutzeinstellungen</p>
+
+    <div id="cookie-banner-actions">
+      <p class="cookie-banner-text" id="cookie-banner-text">
+        Wir verwenden technisch notwendige Technologien sowie &ndash; mit Ihrer Einwilligung
+        &ndash; optionale Dienste. Weitere Informationen finden Sie in unserer
+        <a href="datenschutz.html">Datenschutzerklärung</a>.
+      </p>
+      <div class="cookie-banner-buttons">
+        <button type="button" class="btn btn-outline cookie-btn" id="cookie-accept-necessary">Nur notwendige</button>
+        <button type="button" class="btn btn-primary cookie-btn" id="cookie-accept-all">Alle akzeptieren</button>
+      </div>
+      <button type="button" class="cookie-settings-link" id="cookie-open-settings">Einstellungen</button>
+    </div>
+
+    <div id="cookie-banner-settings" hidden>
+      <div class="cookie-category">
+        <div class="cookie-category-head">
+          <span class="cookie-category-name">Notwendig</span>
+          <span class="cookie-category-status">Immer aktiv</span>
+        </div>
+        <p class="cookie-category-desc">
+          Erforderlich für den grundlegenden Betrieb der Website, z.&nbsp;B. um Ihre
+          Cookie-Einstellungen zu speichern.
+        </p>
+      </div>
+      <p class="cookie-settings-note">
+        Aktuell setzen wir keine optionalen Analyse- oder Marketingtechnologien ein, die
+        Ihrer Einwilligung bedürfen.
+      </p>
+      <div class="cookie-banner-buttons">
+        <button type="button" class="btn btn-primary cookie-btn" id="cookie-save-settings">Auswahl speichern</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/cookie-consent.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>
