@@ -53,7 +53,7 @@
       var nachricht = form.nachricht.value.trim();
       var datenschutz = form.datenschutz.checked;
 
-      if (!name || !email || !nachricht || !datenschutz) {
+      if (!name || !email || !rechtsgebiet || !nachricht || !datenschutz) {
         note.textContent = "Bitte füllen Sie alle Pflichtfelder aus und bestätigen Sie die Datenschutzerklärung.";
         note.classList.add("error");
         return;
