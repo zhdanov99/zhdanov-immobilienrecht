@@ -782,7 +782,7 @@ textarea { resize: vertical; }
   .form-row-split { grid-template-columns: 1fr; }
   .section { padding: 60px 0; }
 
-  .hero { padding-top: 34px; }
+  .hero { padding-top: 34px; padding-bottom: 0; }
 
   .hero-inner { flex-direction: column; align-items: stretch; }
   .hero-media { margin-top: 28px; }
