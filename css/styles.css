@@ -749,13 +749,6 @@ textarea { resize: vertical; }
 .legal-page p, .legal-page li { color: var(--text-muted); }
 .legal-page ul { padding-left: 1.2em; }
 .back-link { display: inline-block; margin-bottom: 2em; }
-.placeholder {
-  background: #fdf1e0;
-  color: #7a5210;
-  padding: 1px 6px;
-  border-radius: 3px;
-  font-weight: 600;
-}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
