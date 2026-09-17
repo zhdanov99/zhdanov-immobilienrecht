@@ -10,7 +10,8 @@
   var SOURCE_LANG = "de";
   var LANGUAGES = [
     { code: "de", label: "DE", title: "Deutsch" },
-    { code: "en", label: "EN", title: "English" }
+    { code: "en", label: "EN", title: "English" },
+    { code: "pt", label: "PT", title: "Português" }
   ];
 
   // Keys the plugin maintains for itself. We only ever read them: writing would
@@ -61,7 +62,7 @@
     wrap.setAttribute("data-lang-switch", "");
     wrap.setAttribute("role", "group");
     wrap.setAttribute("aria-label", "Sprache / Language");
-    // Without this the plugin would translate the DE/EN labels themselves.
+    // Without this the plugin would translate the DE/EN/PT labels themselves.
     wrap.setAttribute("data-translate-ignore", "");
 
     LANGUAGES.forEach(function (language) {
