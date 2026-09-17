@@ -211,6 +211,51 @@ img { max-width: 100%; display: block; }
   border-radius: 2px;
 }
 
+/* ---------- Language switch ---------- */
+.lang-switch {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+/* On the legal pages the switch is alone in the header beside the logo, so it
+   has to push itself to the right edge. */
+.lang-switch:last-child { margin-left: auto; }
+
+.lang-switch__option {
+  background: transparent;
+  border: none;
+  padding: 7px 11px;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.lang-switch__option + .lang-switch__option { border-left: 1px solid var(--border); }
+
+.lang-switch__option:hover {
+  background: var(--bg-alt);
+  color: var(--text);
+}
+
+/* Same fill as .btn-primary: the active language reads as one of the site's
+   own buttons. Declared after :hover so it also holds while hovered. */
+.lang-switch__option.is-active {
+  background: var(--gold);
+  color: var(--white);
+  cursor: default;
+}
+
+.lang-switch__option:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+
 /* ---------- Hero ---------- */
 .hero {
   background: var(--white);
@@ -779,6 +824,9 @@ textarea { resize: vertical; }
   .main-nav.is-open { display: flex; }
   .nav-toggle { display: flex; }
   .header-phone { display: none; }
+  .header-inner { gap: 14px; }
+  .lang-switch { margin-left: auto; }
+  .lang-switch__option { padding: 6px 9px; }
   .form-row-split { grid-template-columns: 1fr; }
   .section { padding: 60px 0; }
 

@@ -9,6 +9,15 @@
 <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="img/favicon-180.png">
 <link rel="stylesheet" href="css/styles.css?v=2">
+<!-- Transable translates the page. Deliberately in the <head> and without
+     async/defer: only there can the plugin hold the page before the first paint,
+     so a visitor reading English never sees German being corrected. The language
+     switch itself belongs to this site (js/lang-switch.js). -->
+<script src="https://transable.to/api/v1/plugin/plugin.js"
+        api-key="tk_live_CvOdUk1Fodp35VfXiMOjjVQ9UwpByqF"
+        data-selector="custom"
+        data-source-lang="de"
+        data-translate-ignore></script>
 </head>
 <body>
 
@@ -158,5 +167,6 @@
 
 <script src="js/cookie-consent.js"></script>
 <script src="js/script.js"></script>
+<script src="js/lang-switch.js"></script>
 </body>
 </html>
