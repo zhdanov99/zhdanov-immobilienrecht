@@ -19,6 +19,74 @@
   var STORAGE_KEY = "webTranslate.targetLanguage";
   var COOKIE_NAME = "transable_lang";
 
+  // The translation runtime handles visible text, but browser metadata and
+  // accessibility attributes need a stable source of truth when visitors
+  // switch directly from one target language to another. Otherwise an English
+  // alt/title can survive an EN -> PT switch because the German source value is
+  // no longer present in the DOM.
+  var PAGE_TITLES = {
+    "index.html": {
+      de: "Zhdanov Kanzlei | Rechtsanwaltskanzlei für Immobilienrecht Berlin",
+      en: "Zhdanov Kanzlei | Real estate law firm in Berlin",
+      pt: "Zhdanov Kanzlei | Escritório de advocacia de direito imobiliário em Berlim"
+    },
+    "impressum.html": {
+      de: "Impressum | Zhdanov Kanzlei",
+      en: "Legal notice | Zhdanov Kanzlei",
+      pt: "Aviso legal | Zhdanov Kanzlei"
+    },
+    "datenschutz.html": {
+      de: "Datenschutzerklärung | Zhdanov Kanzlei",
+      en: "Privacy Policy | Zhdanov Kanzlei",
+      pt: "Política de Privacidade | Zhdanov Kanzlei"
+    }
+  };
+
+  var IMAGE_ALTS = [
+    {
+      selector: 'img[src$="hero-reichstag.jpg"]',
+      de: "Reichstagsgebäude und Paul-Löbe-Haus an der Spree in Berlin",
+      en: "Reichstag Building and Paul Löbe House by the River Spree in Berlin",
+      pt: "Edifício do Reichstag e Paul-Löbe-Haus junto ao rio Spree, em Berlim"
+    },
+    {
+      selector: 'img[src$="logo-zhdanov-kanzlei.png"]',
+      de: "Zhdanov Kanzlei – Recht. Vertrauen. Lösung.",
+      en: "Zhdanov Kanzlei – Law. Trust. Solutions.",
+      pt: "Zhdanov Kanzlei – Direito. Confiança. Soluções."
+    },
+    {
+      selector: 'img[src$="kanzlei-empfang.jpg"]',
+      de: "Empfang in den Räumen der Zhdanov Kanzlei am Kurfürstendamm in Berlin",
+      en: "Reception area at Zhdanov Kanzlei on Kurfürstendamm in Berlin",
+      pt: "Receção da Zhdanov Kanzlei na Kurfürstendamm, em Berlim"
+    },
+    {
+      selector: 'img[src$="michael-zhdanov.jpg"]',
+      de: "Porträt von Rechtsanwalt Michael Zhdanov",
+      en: "Portrait of attorney Michael Zhdanov",
+      pt: "Retrato do advogado Michael Zhdanov"
+    },
+    {
+      selector: 'img[src$="kanzlei-besprechungsraum.jpg"]',
+      de: "Besprechungsraum der Zhdanov Kanzlei",
+      en: "Meeting room at Zhdanov Kanzlei",
+      pt: "Sala de reuniões da Zhdanov Kanzlei"
+    }
+  ];
+
+  var STAR_LABELS = {
+    de: "5 von 5 Sternen",
+    en: "5 out of 5 stars",
+    pt: "5 de 5 estrelas"
+  };
+
+  var SWITCH_LABELS = {
+    de: "Sprache",
+    en: "Language",
+    pt: "Idioma"
+  };
+
   // The plugin picks the language for the first paint and reveals its choice
   // only after its first response, so our mark can be wrong for a moment right
   // after load. Catch up a few times instead of trusting the first read.
@@ -103,6 +171,7 @@
   var options = root.querySelectorAll("[data-lang]");
   var current = "";
   var syncTimer = null;
+  var metadataTimers = [];
 
   var stopSync = function () {
     if (syncTimer === null) return;
@@ -110,20 +179,52 @@
     syncTimer = null;
   };
 
+  var localizeMetadata = function (code) {
+    var path = window.location.pathname.split("/").pop() || "index.html";
+    var titles = PAGE_TITLES[path];
+    if (titles && titles[code]) document.title = titles[code];
+
+    root.setAttribute("aria-label", SWITCH_LABELS[code] || SWITCH_LABELS.de);
+
+    IMAGE_ALTS.forEach(function (entry) {
+      var image = document.querySelector(entry.selector);
+      if (image && entry[code]) image.setAttribute("alt", entry[code]);
+    });
+
+    document.querySelectorAll(".review-stars").forEach(function (stars) {
+      stars.setAttribute("aria-label", STAR_LABELS[code] || STAR_LABELS.de);
+    });
+  };
+
+  var scheduleMetadataSync = function (code) {
+    metadataTimers.forEach(function (timer) {
+      window.clearTimeout(timer);
+    });
+    metadataTimers = [0, 100, 400, 1200].map(function (delay) {
+      return window.setTimeout(function () {
+        if (current === code) localizeMetadata(code);
+      }, delay);
+    });
+  };
+
   var render = function (code) {
     var next = knownLang(code);
-    if (!next || next === current) return;
+    if (!next) return;
+    var changed = next !== current;
     current = next;
 
-    options.forEach(function (option) {
-      var isActive = option.getAttribute("data-lang") === current;
-      option.classList.toggle("is-active", isActive);
-      option.setAttribute("aria-pressed", String(isActive));
-    });
+    if (changed) {
+      options.forEach(function (option) {
+        var isActive = option.getAttribute("data-lang") === current;
+        option.classList.toggle("is-active", isActive);
+        option.setAttribute("aria-pressed", String(isActive));
+      });
+    }
 
     // Assistive technology and the browser's own translation prompt both read
     // the page language off this attribute, so it has to follow along.
     document.documentElement.lang = current;
+    scheduleMetadataSync(current);
   };
 
   var select = function (code) {
