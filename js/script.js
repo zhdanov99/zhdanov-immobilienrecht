@@ -50,6 +50,7 @@
       var email = form.email.value.trim();
       var telefon = form.telefon.value.trim();
       var rechtsgebiet = form.rechtsgebiet.value;
+      var quelle = form.quelle.value;
       var nachricht = form.nachricht.value.trim();
       var datenschutz = form.datenschutz.checked;
 
@@ -81,6 +82,7 @@
           "E-Mail": email,
           Telefon: telefon || "-",
           Themenbereich: rechtsgebiet,
+          "Aufmerksam geworden durch": quelle,
           Nachricht: nachricht,
           _subject: "Anfrage über die Website: " + rechtsgebiet,
           _template: "table"
