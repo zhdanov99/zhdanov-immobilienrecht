@@ -321,6 +321,10 @@ img { max-width: 100%; display: block; }
   box-shadow: 0 14px 34px rgba(16, 33, 63, 0.14);
 }
 
+/* display:flex on the menu overrides the hidden attribute, so without this the
+   list hangs open under the header from the moment the page loads. */
+.lang-switch__menu[hidden] { display: none; }
+
 .lang-switch__item {
   display: flex;
   align-items: center;
