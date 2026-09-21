@@ -7,85 +7,32 @@
   // agreed contract — set window.TRANSLATE_LANG, then fire the event. Nothing
   // else needs to be handed over.
   var EVENT_NAME = "transable:languagechange";
+  var LANGUAGES_EVENT = "transable:languages";
   var SOURCE_LANG = "de";
-  var LANGUAGES = [
+
+  // Which languages appear is decided in the Transable dashboard, not here: the
+  // plugin reads the project's enabled languages and hands them over. Adding a
+  // language is then one switch in the dashboard, with no change to this site.
+  // Until that list arrives, and if it never does, the page keeps the languages
+  // below, so the control is never empty and never waits on the network.
+  var FALLBACK = [
     { code: "de", label: "DE", title: "Deutsch" },
     { code: "en", label: "EN", title: "English" },
     { code: "pt", label: "PT", title: "Português" }
   ];
 
+  // Above this many languages a row of buttons stops fitting the header beside
+  // the logo, the nav and the phone number, so the control becomes a menu: one
+  // button showing the current language, the rest a click away. Measured at
+  // 1280px and 390px; four still fit, five push the header into a second row.
+  var MAX_INLINE = 4;
+  var MAX_INLINE_MOBILE = 3;
+  var MOBILE_QUERY = "(max-width: 760px)";
+
   // Keys the plugin maintains for itself. We only ever read them: writing would
   // give one piece of state two owners, and the plugin would win anyway.
   var STORAGE_KEY = "webTranslate.targetLanguage";
   var COOKIE_NAME = "transable_lang";
-
-  // The translation runtime handles visible text, but browser metadata and
-  // accessibility attributes need a stable source of truth when visitors
-  // switch directly from one target language to another. Otherwise an English
-  // alt/title can survive an EN -> PT switch because the German source value is
-  // no longer present in the DOM.
-  var PAGE_TITLES = {
-    "index.html": {
-      de: "Zhdanov Kanzlei | Rechtsanwaltskanzlei für Immobilienrecht Berlin",
-      en: "Zhdanov Kanzlei | Real estate law firm in Berlin",
-      pt: "Zhdanov Kanzlei | Escritório de advocacia de direito imobiliário em Berlim"
-    },
-    "impressum.html": {
-      de: "Impressum | Zhdanov Kanzlei",
-      en: "Legal notice | Zhdanov Kanzlei",
-      pt: "Aviso legal | Zhdanov Kanzlei"
-    },
-    "datenschutz.html": {
-      de: "Datenschutzerklärung | Zhdanov Kanzlei",
-      en: "Privacy Policy | Zhdanov Kanzlei",
-      pt: "Política de Privacidade | Zhdanov Kanzlei"
-    }
-  };
-
-  var IMAGE_ALTS = [
-    {
-      selector: 'img[src$="hero-reichstag.jpg"]',
-      de: "Reichstagsgebäude und Paul-Löbe-Haus an der Spree in Berlin",
-      en: "Reichstag Building and Paul Löbe House by the River Spree in Berlin",
-      pt: "Edifício do Reichstag e Paul-Löbe-Haus junto ao rio Spree, em Berlim"
-    },
-    {
-      selector: 'img[src$="logo-zhdanov-kanzlei.png"]',
-      de: "Zhdanov Kanzlei – Recht. Vertrauen. Lösung.",
-      en: "Zhdanov Kanzlei – Law. Trust. Solutions.",
-      pt: "Zhdanov Kanzlei – Direito. Confiança. Soluções."
-    },
-    {
-      selector: 'img[src$="kanzlei-empfang.jpg"]',
-      de: "Empfang in den Räumen der Zhdanov Kanzlei am Kurfürstendamm in Berlin",
-      en: "Reception area at Zhdanov Kanzlei on Kurfürstendamm in Berlin",
-      pt: "Receção da Zhdanov Kanzlei na Kurfürstendamm, em Berlim"
-    },
-    {
-      selector: 'img[src$="michael-zhdanov.jpg"]',
-      de: "Porträt von Rechtsanwalt Michael Zhdanov",
-      en: "Portrait of attorney Michael Zhdanov",
-      pt: "Retrato do advogado Michael Zhdanov"
-    },
-    {
-      selector: 'img[src$="kanzlei-besprechungsraum.jpg"]',
-      de: "Besprechungsraum der Zhdanov Kanzlei",
-      en: "Meeting room at Zhdanov Kanzlei",
-      pt: "Sala de reuniões da Zhdanov Kanzlei"
-    }
-  ];
-
-  var STAR_LABELS = {
-    de: "5 von 5 Sternen",
-    en: "5 out of 5 stars",
-    pt: "5 de 5 estrelas"
-  };
-
-  var SWITCH_LABELS = {
-    de: "Sprache",
-    en: "Language",
-    pt: "Idioma"
-  };
 
   // The plugin picks the language for the first paint and reveals its choice
   // only after its first response, so our mark can be wrong for a moment right
@@ -93,11 +40,18 @@
   var SYNC_INTERVAL_MS = 250;
   var SYNC_MAX_TICKS = 20;
 
+  var languages = FALLBACK.slice();
+  var current = "";
+  var syncTimer = null;
+  var root = null;
+  var menu = null;
+  var trigger = null;
+
   var knownLang = function (value) {
     if (typeof value !== "string") return "";
     var code = value.trim().toLowerCase();
-    for (var i = 0; i < LANGUAGES.length; i++) {
-      if (LANGUAGES[i].code === code) return code;
+    for (var i = 0; i < languages.length; i++) {
+      if (languages[i].code === code) return code;
     }
     return "";
   };
@@ -124,16 +78,71 @@
     return SOURCE_LANG;
   };
 
-  var buildSwitch = function () {
-    var wrap = document.createElement("div");
-    wrap.className = "lang-switch";
-    wrap.setAttribute("data-lang-switch", "");
-    wrap.setAttribute("role", "group");
-    wrap.setAttribute("aria-label", "Sprache / Language");
-    // Without this the plugin would translate the DE/EN/PT labels themselves.
-    wrap.setAttribute("data-translate-ignore", "");
+  // A two-letter code is the label; anything longer (pt-BR, zh-Hans) keeps only
+  // the part before the dash, so the buttons stay the same width whatever the
+  // dashboard adds.
+  var labelFor = function (code) {
+    return String(code || "").split("-")[0].toUpperCase();
+  };
 
-    LANGUAGES.forEach(function (language) {
+  // The plugin reports every enabled language, the source one included. Keep the
+  // source first — it is what the page is written in — and the rest in the order
+  // the server sent, which is the dashboard's own sort order.
+  var adoptLanguages = function (list) {
+    if (!list || !list.length) return false;
+
+    var seen = {};
+    var next = [];
+    var add = function (entry) {
+      var code = String(entry && entry.code || "").trim().toLowerCase();
+      if (!code || seen[code]) return;
+      seen[code] = true;
+      next.push({
+        code: code,
+        label: labelFor(code),
+        title: entry.nativeName || entry.name || labelFor(code)
+      });
+    };
+
+    list.forEach(function (entry) {
+      if (String(entry && entry.code || "").toLowerCase() === SOURCE_LANG) add(entry);
+    });
+    if (!next.length) add({ code: SOURCE_LANG, nativeName: "Deutsch" });
+    list.forEach(add);
+
+    if (next.length < 2) return false;
+    languages = next;
+    return true;
+  };
+
+  var isMobile = function () {
+    try {
+      return window.matchMedia(MOBILE_QUERY).matches;
+    } catch (err) {
+      return window.innerWidth <= 760;
+    }
+  };
+
+  var useMenu = function () {
+    return languages.length > (isMobile() ? MAX_INLINE_MOBILE : MAX_INLINE);
+  };
+
+  var closeMenu = function () {
+    if (!menu || menu.hidden) return;
+    menu.hidden = true;
+    if (trigger) trigger.setAttribute("aria-expanded", "false");
+  };
+
+  var openMenu = function () {
+    if (!menu || !menu.hidden) return;
+    menu.hidden = false;
+    if (trigger) trigger.setAttribute("aria-expanded", "true");
+    var active = menu.querySelector('[aria-selected="true"]') || menu.firstElementChild;
+    if (active) active.focus();
+  };
+
+  var buildInline = function (wrap) {
+    languages.forEach(function (language) {
       var option = document.createElement("button");
       option.type = "button";
       option.className = "lang-switch__option";
@@ -141,90 +150,114 @@
       option.setAttribute("lang", language.code);
       option.title = language.title;
       option.textContent = language.label;
+      option.addEventListener("click", function () { select(language.code); });
       wrap.appendChild(option);
     });
-
-    return wrap;
   };
 
-  // The legal pages carry nothing but the logo in the header, so they ship no
-  // markup for the switch and we build it here. Where there is a burger, stay
-  // to its left; otherwise the switch is the last child and the stylesheet
-  // pushes it to the right edge on its own.
-  var mountSwitch = function () {
-    var headerInner = document.querySelector(".header-inner");
-    if (!headerInner) return null;
+  var buildMenu = function (wrap) {
+    trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.className = "lang-switch__trigger";
+    trigger.setAttribute("aria-haspopup", "listbox");
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.setAttribute("aria-label", "Sprache wählen / Choose language");
+    trigger.innerHTML = '<span class="lang-switch__code"></span><span class="lang-switch__caret" aria-hidden="true"></span>';
+    wrap.appendChild(trigger);
 
-    var wrap = buildSwitch();
-    var navToggle = headerInner.querySelector(".nav-toggle");
-    if (navToggle) {
-      headerInner.insertBefore(wrap, navToggle);
-    } else {
-      headerInner.appendChild(wrap);
+    menu = document.createElement("div");
+    menu.className = "lang-switch__menu";
+    menu.setAttribute("role", "listbox");
+    menu.hidden = true;
+    languages.forEach(function (language) {
+      var option = document.createElement("button");
+      option.type = "button";
+      option.className = "lang-switch__item";
+      option.setAttribute("role", "option");
+      option.setAttribute("data-lang", language.code);
+      option.setAttribute("lang", language.code);
+      option.setAttribute("aria-selected", "false");
+      option.innerHTML = '<span class="lang-switch__item-code"></span><span class="lang-switch__item-name"></span>';
+      option.firstChild.textContent = language.label;
+      option.lastChild.textContent = language.title;
+      option.addEventListener("click", function () {
+        select(language.code);
+        closeMenu();
+        if (trigger) trigger.focus();
+      });
+      menu.appendChild(option);
+    });
+    wrap.appendChild(menu);
+
+    trigger.addEventListener("click", function () {
+      if (menu.hidden) openMenu(); else closeMenu();
+    });
+    wrap.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !menu.hidden) {
+        closeMenu();
+        trigger.focus();
+      }
+    });
+    document.addEventListener("click", function (event) {
+      if (!wrap.contains(event.target)) closeMenu();
+    });
+  };
+
+  // Rebuilt rather than patched whenever the language list or the viewport
+  // crosses the point where buttons stop fitting: one place decides what the
+  // control is, so the two shapes can never disagree about the current language.
+  var render = function () {
+    if (!root) return;
+    var wasFocused = root.contains(document.activeElement);
+    menu = null;
+    trigger = null;
+    root.textContent = "";
+    root.setAttribute("data-shape", useMenu() ? "menu" : "inline");
+    if (useMenu()) buildMenu(root); else buildInline(root);
+    mark(current);
+    if (wasFocused) {
+      var target = root.querySelector('.lang-switch__trigger, .lang-switch__option.is-active, .lang-switch__option');
+      if (target) target.focus();
     }
-    return wrap;
   };
 
-  var root = document.querySelector("[data-lang-switch]") || mountSwitch();
-  if (!root) return;
+  var mark = function (code) {
+    if (!root || !code) return;
+    Array.prototype.forEach.call(root.querySelectorAll("[data-lang]"), function (option) {
+      var isActive = option.getAttribute("data-lang") === code;
+      option.classList.toggle("is-active", isActive);
+      if (option.classList.contains("lang-switch__item")) {
+        option.setAttribute("aria-selected", String(isActive));
+      } else {
+        option.setAttribute("aria-pressed", String(isActive));
+      }
+    });
+    var label = root.querySelector(".lang-switch__code");
+    if (label) {
+      for (var i = 0; i < languages.length; i++) {
+        if (languages[i].code === code) {
+          label.textContent = languages[i].label;
+          if (trigger) trigger.title = languages[i].title;
+          break;
+        }
+      }
+    }
+  };
 
-  var options = root.querySelectorAll("[data-lang]");
-  var current = "";
-  var syncTimer = null;
-  var metadataTimers = [];
+  var apply = function (code) {
+    var next = knownLang(code);
+    if (!next || next === current) return;
+    current = next;
+    mark(current);
+    // Assistive technology and the browser's own translation prompt both read
+    // the page language off this attribute, so it has to follow along.
+    document.documentElement.lang = current;
+  };
 
   var stopSync = function () {
     if (syncTimer === null) return;
     window.clearInterval(syncTimer);
     syncTimer = null;
-  };
-
-  var localizeMetadata = function (code) {
-    var path = window.location.pathname.split("/").pop() || "index.html";
-    var titles = PAGE_TITLES[path];
-    if (titles && titles[code]) document.title = titles[code];
-
-    root.setAttribute("aria-label", SWITCH_LABELS[code] || SWITCH_LABELS.de);
-
-    IMAGE_ALTS.forEach(function (entry) {
-      var image = document.querySelector(entry.selector);
-      if (image && entry[code]) image.setAttribute("alt", entry[code]);
-    });
-
-    document.querySelectorAll(".review-stars").forEach(function (stars) {
-      stars.setAttribute("aria-label", STAR_LABELS[code] || STAR_LABELS.de);
-    });
-  };
-
-  var scheduleMetadataSync = function (code) {
-    metadataTimers.forEach(function (timer) {
-      window.clearTimeout(timer);
-    });
-    metadataTimers = [0, 100, 400, 1200].map(function (delay) {
-      return window.setTimeout(function () {
-        if (current === code) localizeMetadata(code);
-      }, delay);
-    });
-  };
-
-  var render = function (code) {
-    var next = knownLang(code);
-    if (!next) return;
-    var changed = next !== current;
-    current = next;
-
-    if (changed) {
-      options.forEach(function (option) {
-        var isActive = option.getAttribute("data-lang") === current;
-        option.classList.toggle("is-active", isActive);
-        option.setAttribute("aria-pressed", String(isActive));
-      });
-    }
-
-    // Assistive technology and the browser's own translation prompt both read
-    // the page language off this attribute, so it has to follow along.
-    document.documentElement.lang = current;
-    scheduleMetadataSync(current);
   };
 
   var select = function (code) {
@@ -238,26 +271,68 @@
 
     window.TRANSLATE_LANG = next;
     window.dispatchEvent(new Event(EVENT_NAME));
-    render(next);
+    apply(next);
   };
 
-  options.forEach(function (option) {
-    option.addEventListener("click", function () {
-      select(option.getAttribute("data-lang"));
-    });
-  });
+  // The legal pages carry nothing but the logo in the header, so they ship no
+  // markup for the switch and we build it here. Where there is a burger, stay
+  // to its left; otherwise the switch is the last child and the stylesheet
+  // pushes it to the right edge on its own.
+  var mountSwitch = function () {
+    var headerInner = document.querySelector(".header-inner");
+    if (!headerInner) return null;
 
-  render(readStoredLang());
+    var wrap = document.createElement("div");
+    wrap.className = "lang-switch";
+    wrap.setAttribute("data-lang-switch", "");
+    wrap.setAttribute("role", "group");
+    wrap.setAttribute("aria-label", "Sprache / Language");
+    // Without this the plugin would translate the language names themselves.
+    wrap.setAttribute("data-translate-ignore", "");
+
+    var navToggle = headerInner.querySelector(".nav-toggle");
+    if (navToggle) headerInner.insertBefore(wrap, navToggle);
+    else headerInner.appendChild(wrap);
+    return wrap;
+  };
+
+  root = document.querySelector("[data-lang-switch]") || mountSwitch();
+  if (!root) return;
+  root.setAttribute("data-translate-ignore", "");
+
+  current = readStoredLang();
+  render();
+  document.documentElement.lang = current;
+
+  // The dashboard's list, whenever it arrives: before this script ran (the
+  // property), or after it (the event).
+  var onLanguages = function (detail) {
+    if (!detail || !adoptLanguages(detail.languages)) return;
+    if (!knownLang(current)) current = SOURCE_LANG;
+    render();
+  };
+  if (window.Transable && window.Transable.languages) onLanguages(window.Transable);
+  window.addEventListener(LANGUAGES_EVENT, function (event) { onLanguages(event.detail); });
 
   // The plugin announces language changes of its own with the same event.
   window.addEventListener(EVENT_NAME, function () {
-    render(knownLang(window.TRANSLATE_LANG) || readStoredLang());
+    apply(knownLang(window.TRANSLATE_LANG) || readStoredLang());
+  });
+
+  // Rotating a phone can move the control between its two shapes.
+  var reshapeTimer = null;
+  window.addEventListener("resize", function () {
+    window.clearTimeout(reshapeTimer);
+    reshapeTimer = window.setTimeout(function () {
+      var wanted = useMenu() ? "menu" : "inline";
+      if (root.getAttribute("data-shape") !== wanted) render();
+    }, 150);
   });
 
   var ticks = 0;
   syncTimer = window.setInterval(function () {
     ticks++;
     if (ticks >= SYNC_MAX_TICKS) stopSync();
-    render(readStoredLang());
+    apply(readStoredLang());
   }, SYNC_INTERVAL_MS);
 })();

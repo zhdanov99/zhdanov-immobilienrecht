@@ -256,6 +256,102 @@ img { max-width: 100%; display: block; }
   outline-offset: -2px;
 }
 
+/* Beyond four languages a row of codes no longer fits beside the logo, the nav
+   and the phone number, so the control becomes a menu: the current language on
+   a single button, the rest one click away. Same border, radius and gold fill,
+   so both shapes read as the same control. */
+/* The inline shape is one bordered group with the options inside it, and it
+   clips them to the rounded corner. A dropdown must not be clipped, so in this
+   shape the border moves from the group to the trigger and the group stops
+   clipping; otherwise the menu is cut off at the trigger's own edge and cannot
+   even be clicked. */
+.lang-switch[data-shape="menu"] {
+  position: relative;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+}
+.lang-switch[data-shape="menu"] .lang-switch__trigger {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.lang-switch__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 7px 11px;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.lang-switch__trigger:hover { background: var(--bg-alt); color: var(--text); }
+.lang-switch__trigger[aria-expanded="true"] { background: var(--gold); color: var(--white); }
+.lang-switch__trigger:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+
+.lang-switch__caret {
+  width: 0;
+  height: 0;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+  border-top: 4px solid currentColor;
+}
+
+.lang-switch__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 60;
+  min-width: 190px;
+  max-height: min(340px, 60vh);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 14px 34px rgba(16, 33, 63, 0.14);
+}
+
+.lang-switch__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: calc(var(--radius) - 2px);
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.lang-switch__item:hover { background: var(--bg-alt); }
+.lang-switch__item:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.lang-switch__item.is-active { background: var(--gold); color: var(--white); cursor: default; }
+
+.lang-switch__item-code {
+  flex: 0 0 26px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.lang-switch__item.is-active .lang-switch__item-code { color: var(--white); }
+.lang-switch__item-name { flex: 1 1 auto; }
+
 /* ---------- Hero ---------- */
 .hero {
   background: var(--white);
@@ -826,7 +922,9 @@ textarea { resize: vertical; }
   .header-phone { display: none; }
   .header-inner { gap: 14px; }
   .lang-switch { margin-left: auto; }
-  .lang-switch__option { padding: 6px 9px; }
+  .lang-switch__option,
+  .lang-switch__trigger { padding: 6px 9px; }
+  .lang-switch__menu { min-width: 172px; }
   .form-row-split { grid-template-columns: 1fr; }
   .section { padding: 60px 0; }
 
