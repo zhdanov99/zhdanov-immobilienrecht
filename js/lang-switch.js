@@ -18,16 +18,9 @@
   var FALLBACK = [
     { code: "de", label: "DE", title: "Deutsch" },
     { code: "en", label: "EN", title: "English" },
-    { code: "pt", label: "PT", title: "Português" }
+    { code: "pt", label: "PT", title: "Português" },
+    { code: "ru", label: "RU", title: "Русский" }
   ];
-
-  // Above this many languages a row of buttons stops fitting the header beside
-  // the logo, the nav and the phone number, so the control becomes a menu: one
-  // button showing the current language, the rest a click away. Measured at
-  // 1280px and 390px; four still fit, five push the header into a second row.
-  var MAX_INLINE = 4;
-  var MAX_INLINE_MOBILE = 3;
-  var MOBILE_QUERY = "(max-width: 760px)";
 
   // Keys the plugin maintains for itself. We only ever read them: writing would
   // give one piece of state two owners, and the plugin would win anyway.
@@ -56,6 +49,13 @@
     return "";
   };
 
+  var entryFor = function (code) {
+    for (var i = 0; i < languages.length; i++) {
+      if (languages[i].code === code) return languages[i];
+    }
+    return null;
+  };
+
   // localStorage throws outright in a private window, and a locked-down cookie
   // setup can make document.cookie unhappy too, so neither read may escape and
   // take the whole switch down with it.
@@ -78,16 +78,16 @@
     return SOURCE_LANG;
   };
 
-  // A two-letter code is the label; anything longer (pt-BR, zh-Hans) keeps only
-  // the part before the dash, so the buttons stay the same width whatever the
-  // dashboard adds.
+  // A two-letter code is the closed label; anything longer (pt-BR, zh-Hans)
+  // keeps only the part before the dash, so the trigger stays the same width
+  // whatever the dashboard adds.
   var labelFor = function (code) {
     return String(code || "").split("-")[0].toUpperCase();
   };
 
-  // The plugin reports every enabled language, the source one included. Keep the
-  // source first — it is what the page is written in — and the rest in the order
-  // the server sent, which is the dashboard's own sort order.
+  // The plugin reports every enabled language, the source one included. German
+  // is the language this site is written in, so it comes first however the
+  // dashboard sorts its list; the rest follow in the order the server sent.
   var adoptLanguages = function (list) {
     if (!list || !list.length) return false;
 
@@ -100,6 +100,9 @@
       next.push({
         code: code,
         label: labelFor(code),
+        // The name a speaker of that language recognises. Someone looking for
+        // their own language scans the list for "Русский", not for "Russian"
+        // spelled out in a language they may not read.
         title: entry.nativeName || entry.name || labelFor(code)
       });
     };
@@ -113,18 +116,6 @@
     if (next.length < 2) return false;
     languages = next;
     return true;
-  };
-
-  var isMobile = function () {
-    try {
-      return window.matchMedia(MOBILE_QUERY).matches;
-    } catch (err) {
-      return window.innerWidth <= 760;
-    }
-  };
-
-  var useMenu = function () {
-    return languages.length > (isMobile() ? MAX_INLINE_MOBILE : MAX_INLINE);
   };
 
   var closeMenu = function () {
@@ -141,21 +132,11 @@
     if (active) active.focus();
   };
 
-  var buildInline = function (wrap) {
-    languages.forEach(function (language) {
-      var option = document.createElement("button");
-      option.type = "button";
-      option.className = "lang-switch__option";
-      option.setAttribute("data-lang", language.code);
-      option.setAttribute("lang", language.code);
-      option.title = language.title;
-      option.textContent = language.label;
-      option.addEventListener("click", function () { select(language.code); });
-      wrap.appendChild(option);
-    });
-  };
-
-  var buildMenu = function (wrap) {
+  // Always a dropdown, at every language count and every width. Closed, it is
+  // one code-width button that never reflows the header; open, it has room for
+  // the full name of every language. A row of inline codes only ever fit three
+  // or four of them, and a bare code reads as a country rather than a language.
+  var build = function (wrap) {
     trigger = document.createElement("button");
     trigger.type = "button";
     trigger.className = "lang-switch__trigger";
@@ -175,11 +156,12 @@
       option.className = "lang-switch__item";
       option.setAttribute("role", "option");
       option.setAttribute("data-lang", language.code);
+      // Each row is written in its own language, so it needs its own lang
+      // attribute: without it a screen reader reads "Русский" by German
+      // pronunciation rules and the browser may pick the wrong font.
       option.setAttribute("lang", language.code);
       option.setAttribute("aria-selected", "false");
-      option.innerHTML = '<span class="lang-switch__item-code"></span><span class="lang-switch__item-name"></span>';
-      option.firstChild.textContent = language.label;
-      option.lastChild.textContent = language.title;
+      option.textContent = language.title;
       option.addEventListener("click", function () {
         select(language.code);
         closeMenu();
@@ -203,22 +185,17 @@
     });
   };
 
-  // Rebuilt rather than patched whenever the language list or the viewport
-  // crosses the point where buttons stop fitting: one place decides what the
-  // control is, so the two shapes can never disagree about the current language.
+  // Rebuilt rather than patched when the dashboard's list arrives, so the
+  // control and the current language can never disagree about what is in it.
   var render = function () {
     if (!root) return;
     var wasFocused = root.contains(document.activeElement);
     menu = null;
     trigger = null;
     root.textContent = "";
-    root.setAttribute("data-shape", useMenu() ? "menu" : "inline");
-    if (useMenu()) buildMenu(root); else buildInline(root);
+    build(root);
     mark(current);
-    if (wasFocused) {
-      var target = root.querySelector('.lang-switch__trigger, .lang-switch__option.is-active, .lang-switch__option');
-      if (target) target.focus();
-    }
+    if (wasFocused && trigger) trigger.focus();
   };
 
   var mark = function (code) {
@@ -226,21 +203,15 @@
     Array.prototype.forEach.call(root.querySelectorAll("[data-lang]"), function (option) {
       var isActive = option.getAttribute("data-lang") === code;
       option.classList.toggle("is-active", isActive);
-      if (option.classList.contains("lang-switch__item")) {
-        option.setAttribute("aria-selected", String(isActive));
-      } else {
-        option.setAttribute("aria-pressed", String(isActive));
-      }
+      option.setAttribute("aria-selected", String(isActive));
     });
     var label = root.querySelector(".lang-switch__code");
-    if (label) {
-      for (var i = 0; i < languages.length; i++) {
-        if (languages[i].code === code) {
-          label.textContent = languages[i].label;
-          if (trigger) trigger.title = languages[i].title;
-          break;
-        }
-      }
+    var entry = entryFor(code);
+    if (label && entry) {
+      // Closed, the control says only the code: two letters are the widest the
+      // header can give it, and the full name is one click away.
+      label.textContent = entry.label;
+      if (trigger) trigger.title = entry.title;
     }
   };
 
@@ -314,19 +285,12 @@
   if (window.Transable && window.Transable.languages) onLanguages(window.Transable);
   window.addEventListener(LANGUAGES_EVENT, function (event) { onLanguages(event.detail); });
 
-  // The plugin announces language changes of its own with the same event.
+  // The plugin announces language changes of its own with the same event. That
+  // is also how a first-time visitor's browser language arrives: the project
+  // has auto-detect on, so a Russian browser lands on Russian and the trigger
+  // has to catch up from DE.
   window.addEventListener(EVENT_NAME, function () {
     apply(knownLang(window.TRANSLATE_LANG) || readStoredLang());
-  });
-
-  // Rotating a phone can move the control between its two shapes.
-  var reshapeTimer = null;
-  window.addEventListener("resize", function () {
-    window.clearTimeout(reshapeTimer);
-    reshapeTimer = window.setTimeout(function () {
-      var wanted = useMenu() ? "menu" : "inline";
-      if (root.getAttribute("data-shape") !== wanted) render();
-    }, 150);
   });
 
   var ticks = 0;

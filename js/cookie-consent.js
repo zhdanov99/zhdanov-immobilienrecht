@@ -1,13 +1,24 @@
 (function () {
   "use strict";
 
-  // Minimal cookie/consent-storage manager. This site currently loads no
-  // analytics, tracking, or third-party embeds -- the "necessary" category
-  // (used only to remember this consent choice) is the only one active
-  // today. The gate below (window.ZKConsent) is where any future
-  // consent-requiring script would check before loading anything, so
-  // adding e.g. analytics later means loading it behind
-  // ZKConsent.hasConsent("analytics") instead of unconditionally.
+  // Minimal cookie/consent-storage manager. Only the "necessary" category is
+  // active today, and it covers exactly two things: this consent choice and the
+  // visitor's chosen language.
+  //
+  // The translation widget does load before this banner is answered, on purpose:
+  // it draws the language switcher and restores an already chosen language, so a
+  // visitor who picked English last week would otherwise be shown German until
+  // they clicked something. It is loaded with data-visitor-analytics="off", so it
+  // keeps no identifier in the browser and sends none -- what is left is a
+  // request that translates the page the visitor asked for, which is why it does
+  // not need consent under TDDDG s 25(2)(2). Turn that flag back on and this
+  // stops being true: the widget would then store a persistent id, and the load
+  // would have to move behind ZKConsent.hasConsent(...).
+  //
+  // The gate below (window.ZKConsent) is where any future consent-requiring
+  // script checks before loading anything, so adding e.g. analytics later means
+  // loading it behind ZKConsent.hasConsent("analytics") instead of
+  // unconditionally.
 
   var STORAGE_KEY = "zk_cookie_consent";
   var CONSENT_VERSION = 1;

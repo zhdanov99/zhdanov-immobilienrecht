@@ -8,15 +8,25 @@
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="img/favicon-180.png">
-<link rel="stylesheet" href="css/styles.css?v=2">
+<link rel="stylesheet" href="css/styles.css?v=3">
 <!-- Transable translates the page. Deliberately in the <head> and without
      async/defer: only there can the plugin hold the page before the first paint,
      so a visitor reading English never sees German being corrected. The language
-     switch itself belongs to this site (js/lang-switch.js). -->
+     switch itself belongs to this site (js/lang-switch.js).
+
+     It therefore runs before the cookie banner is answered, which is allowed
+     because of the flag below: data-visitor-analytics="off" stops the widget
+     storing or sending any identifier, so all that is left on the device is the
+     chosen language, and all that leaves the device is the page text plus the
+     IP of the request that translates it. That is the service the visitor asked
+     for (TDDDG s 25(2)(2)), and section 7 of datenschutz.html says so plainly.
+     Removing the flag would put a persistent id in the browser before consent
+     and make that section untrue. -->
 <script src="https://transable.to/api/v1/plugin/plugin.js"
         api-key="tk_live_CvOdUk1Fodp35VfXiMOjjVQ9UwpByqF"
         data-selector="custom"
         data-source-lang="de"
+        data-visitor-analytics="off"
         data-translate-ignore></script>
 </head>
 <body>
@@ -97,21 +107,71 @@
 
   <h2>6. Cookies und lokale Speicherung</h2>
   <p>
-    Diese Website verwendet keine Cookies zu Analyse- oder Marketingzwecken und bindet
-    keine externen Schriftarten, Karten- oder Trackingdienste ein, die eine Übertragung
-    Ihrer Daten an Dritte auslösen würden.
+    Diese Website verwendet keine Cookies zu Analyse- oder Marketingzwecken, bindet keine
+    externen Schriftarten oder Kartendienste ein und setzt keine Technologien ein, die Ihr
+    Verhalten über diese Website hinaus nachvollziehbar machen. Auf Ihrem Gerät werden
+    ausschließlich zwei technisch notwendige Angaben gespeichert:
   </p>
+  <ul>
+    <li>
+      <strong>Ihre Auswahl im Hinweis-Banner</strong> (lokaler Speicher Ihres Browsers,
+      Schlüssel <code>zk_cookie_consent</code>), damit der Hinweis nicht bei jedem
+      Seitenaufruf erneut erscheint.
+    </li>
+    <li>
+      <strong>Die von Ihnen gewählte Sprache</strong> (lokaler Speicher sowie das Cookie
+      <code>transable_lang</code>), damit die Website Ihnen beim nächsten Aufruf in
+      derselben Sprache begegnet. Gespeichert wird allein das Kürzel der Sprache; eine
+      Kennung, mit der Sie wiedererkannt oder gezählt werden könnten, wird nicht angelegt.
+    </li>
+  </ul>
   <p>
-    Beim Aufruf der Website weisen wir Sie über einen Hinweis-Banner auf diesen Sachverhalt
-    hin. Ihre Auswahl wird ausschließlich technisch notwendig im lokalen Speicher (Local
-    Storage) Ihres Browsers abgelegt, damit der Hinweis nicht bei jedem Seitenaufruf erneut
-    erscheint. Diese Information verbleibt auf Ihrem Gerät und wird nicht an uns oder Dritte
-    übertragen. Sollten wir künftig optionale Analyse- oder Marketingdienste einsetzen, würden
-    diese erst nach Ihrer aktiven Einwilligung geladen. Sie können Ihre Auswahl jederzeit über
-    den Link &bdquo;Datenschutzeinstellungen&ldquo; im Fußbereich der Website ändern.
+    Beide Angaben verbleiben auf Ihrem Gerät und werden nicht an Dritte übertragen.
+    Rechtsgrundlage für diese Speicherung ist § 25 Abs. 2 Nr. 2 TDDDG, da sie für die
+    von Ihnen gewünschte Nutzung der Website unbedingt erforderlich ist. Sollten wir
+    künftig optionale Analyse- oder Marketingdienste einsetzen, würden diese erst nach
+    Ihrer aktiven Einwilligung geladen. Sie können Ihre Auswahl jederzeit über den Link
+    &bdquo;Datenschutzeinstellungen&ldquo; im Fußbereich der Website ändern.
   </p>
 
-  <h2>7. Ihre Rechte</h2>
+  <h2>7. Übersetzung der Website</h2>
+  <p>
+    Diese Website ist in deutscher Sprache verfasst und kann über die Sprachauswahl in der
+    Kopfzeile in weitere Sprachen übersetzt werden. Die Übersetzung erfolgt maschinell
+    durch den Dienst <strong>Transable</strong>, betrieben von Nikolaj Kaluđerović,
+    <a href="mailto:koljakalud@gmail.com">koljakalud@gmail.com</a>
+    (<a href="https://transable.to" rel="noopener" target="_blank">transable.to</a>). Der
+    Dienst ist für uns als Auftragsverarbeiter nach Art. 28 DSGVO tätig und verarbeitet
+    die Daten ausschließlich weisungsgebunden zum Zweck der Übersetzung.
+  </p>
+  <p>
+    Der Übersetzungsdienst wird bereits beim Aufruf der Seite geladen, weil ohne ihn die
+    Sprachauswahl nicht dargestellt und eine bereits gewählte Sprache nicht angezeigt
+    werden kann. Dabei werden die auf der aufgerufenen Seite sichtbaren Texte sowie Ihre
+    IP-Adresse und technische Angaben des Aufrufs (Zeitpunkt, Browserkennung, aufgerufene
+    Adresse, gewählte Sprache) an die Server von Transable übermittelt und dort
+    verarbeitet. Die Server von Transable stehen in Nürnberg, Deutschland. Zur Erzeugung
+    der Übersetzung werden allein die zu übersetzenden Texte, ohne Ihre IP-Adresse,
+    an den Dienst Gemini API von Google weitergegeben; eine damit verbundene Übermittlung
+    in Drittländer, insbesondere die USA, erfolgt auf Grundlage der
+    EU-Standardvertragsklauseln bzw. des EU-US Data Privacy Framework. Bereits übersetzte
+    Texte werden bei Transable zwischengespeichert, damit dieselbe Seite nicht erneut
+    übersetzt werden muss; sie enthalten keine Angaben zu Ihrer Person.
+  </p>
+  <p>
+    Die Texte dieser Website sind öffentlich; personenbezogene Daten werden durch die
+    Übersetzung nur insoweit verarbeitet, als sie in Ihrer IP-Adresse und den technischen
+    Angaben des Aufrufs liegen. Rechtsgrundlage ist unser berechtigtes Interesse daran, die
+    Inhalte dieser Kanzlei auch nicht deutschsprachigen Mandantinnen und Mandanten
+    zugänglich zu machen (Art. 6 Abs. 1 lit. f DSGVO). Rufen Sie die Website in einer
+    anderen Sprache auf, tritt die Durchführung des von Ihnen gewünschten Dienstes hinzu
+    (Art. 6 Abs. 1 lit. b DSGVO). Inhalte, die Sie in das Kontaktformular eingeben, werden
+    nicht an den Übersetzungsdienst übermittelt. Sie können der Verarbeitung nach
+    Art. 21 DSGVO widersprechen; wenden Sie sich dazu an die unter Ziffer 1 genannte
+    Adresse.
+  </p>
+
+  <h2>8. Ihre Rechte</h2>
   <p>Ihnen stehen als betroffener Person grundsätzlich folgende Rechte zu:</p>
   <ul>
     <li>Recht auf Auskunft (Art. 15 DSGVO)</li>
@@ -127,7 +187,7 @@
     Datenschutz und Informationsfreiheit, Friedrichstr. 219, 10969 Berlin.
   </p>
 
-  <h2>8. Aktualität und Änderung dieser Datenschutzerklärung</h2>
+  <h2>9. Aktualität und Änderung dieser Datenschutzerklärung</h2>
   <p>
     Diese Datenschutzerklärung ist aktuell gültig. Durch die Weiterentwicklung der
     Website oder aufgrund geänderter gesetzlicher bzw. behördlicher Vorgaben kann es
@@ -173,8 +233,10 @@
             <span class="cookie-category-status">Immer aktiv</span>
           </div>
           <p class="cookie-category-desc">
-            Erforderlich für den grundlegenden Betrieb der Website, z.&nbsp;B. um Ihre
-            Cookie-Einstellungen zu speichern.
+            Erforderlich für den grundlegenden Betrieb der Website: um Ihre Auswahl in
+            diesem Hinweis zu speichern und um sich die von Ihnen gewählte Sprache zu
+            merken. Eine Kennung, mit der Sie wiedererkannt werden könnten, wird dabei
+            nicht angelegt.
           </p>
         </div>
         <p class="cookie-settings-note">
@@ -191,6 +253,6 @@
 
 <script src="js/cookie-consent.js"></script>
 <script src="js/script.js"></script>
-<script src="js/lang-switch.js"></script>
+<script src="js/lang-switch.js?v=3"></script>
 </body>
 </html>
